@@ -8,7 +8,7 @@ const int ledsRGB[3] = {10, 9, 11};
 // Potentiometer pin
 int potPin = A0;
 
-// Button & variable to control wether to subtract or add to valueRGB
+// Button & variable to control whether to change or save valueRGB
 const int btnMode = 13;
 bool modeAdd = false;
 
@@ -36,6 +36,7 @@ void setup() {
   // Initialize mode button
   pinMode(btnMode, INPUT);
 
+  // Initialize potentiometer
   pinMode(potPin, INPUT);
 }
 
@@ -79,6 +80,8 @@ void loop() {
 //Change current active LED
 void setLED(int color){
   currentLED = color;
+
+  // reset mode to automatically save state
   modeAdd = false;
 }
 
@@ -86,28 +89,19 @@ void setLED(int color){
 // Update valueRGB and write change
 void updateValue(int colour){
 
-  // Add or subtract depending on mode
+  // button needs pressed and to be in change mode to use pot. input
   if(modeAdd == true){
 
     valuePot = analogRead(potPin);
-    //Serial.print(valuePot);
-    int brightness = map(valuePot, 10, 1023, 0, 255);
-    // Don't let the value be more than 255
-//    if(valueRGB[colour] >= 255){
-//      valueRGB[colour] = 255;
-//    }  else {
-//
-//      // Don't let the value be less than 0
-//      if(valueRGB[colour] <= 0){
-//        valueRGB[colour] = 0;
-//      }
-////      } else {
-////        valueRGB[colour]--;
-////      }
-//    }
+
+    //Scaling the potentiometer input to fit LED range
+    int brightness = map(valuePot, 0, 1023, 0, 255);
+    
+    //potentiometer won't do a clean 0 so this works
     if(valuePot <10){
       brightness = 0;
       }
+
     valueRGB[colour] = brightness;
 
     // Actually update the value of corresponding pin
